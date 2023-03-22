@@ -21,6 +21,8 @@ void AShooterCharacter::BeginPlay()
 	GetMesh()->HideBoneByName(TEXT("Weapon-r"), EPhysBodyOp::PBO_None);
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 	Gun->SetOwner(this);
+
+	Health = MaxHealth;
 	
 }
 
@@ -70,4 +72,21 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 void AShooterCharacter::Shoot()
 {
 	Gun->PullTrigger();
+}
+
+float AShooterCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent, class AController *EventInstigator, AActor *DamageCauser)
+{
+	float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	//if Health is lower than DamageToApply, take Health b/c Health cannot be negative
+	DamageToApply = FMath::Min(Health, DamageToApply); 
+	Health -= DamageToApply;
+
+	return DamageToApply;
+
+}
+
+bool AShooterCharacter::IsDead() const
+{
+	return Health <= 0;
 }
