@@ -20,7 +20,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
-
+	bool IsDead() const;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
