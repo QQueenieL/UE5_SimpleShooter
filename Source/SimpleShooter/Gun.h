@@ -15,6 +15,17 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	void PullTrigger();
+	void CheckAmmo();
+	void ReloadWeapon();
+
 	//The total amount of ammo that can be carried for the weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	int maxTotalAmmo;
@@ -37,16 +48,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
 	void TriggerdOutOfAmmoPopUp();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	void PullTrigger();
-	void ReloadWeapon();
 
 private:
 	UPROPERTY(VisibleAnywhere)

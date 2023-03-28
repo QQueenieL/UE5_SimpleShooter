@@ -41,11 +41,35 @@ void AGun::Tick(float DeltaTime)
 
 }
 
+void AGun::CheckAmmo()
+{
+	if (GetOwnerController()->IsPlayerController())
+	{
+		if (clipAmmo > 0)
+		{
+			clipAmmo -= 1;
+			PullTrigger();
+		}
+		else if (totalAmmo > 0)
+		{
+			ReloadWeapon();
+		}
+		else
+		{
+			TriggerdOutOfAmmoPopUp();
+		}
+	}
+	else
+	{
+		PullTrigger();
+	}
+}
+
 void AGun::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
 	UGameplayStatics::SpawnSoundAttached(MuzzleSound, Mesh, TEXT("MuzzleSoundSocket"));
-	clipAmmo -= 1;
+	
 	FHitResult Hit;
 	FVector ShotDirection;
 	bool bSuccess = GunTrace(Hit, ShotDirection);

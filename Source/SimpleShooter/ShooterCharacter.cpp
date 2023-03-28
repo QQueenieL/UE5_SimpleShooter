@@ -70,20 +70,9 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 
 void AShooterCharacter::Shoot()
 {
-	if (Gun->clipAmmo > 0)
-	{
-		Gun->PullTrigger();
-	}
-	else if (Gun->totalAmmo > 0)
-	{
-		Gun->ReloadWeapon();
-	}
-	else
-	{
-		TriggerdOutOfAmmoPopUp();
-	}
+	//Gun->PullTrigger();
+	Gun->CheckAmmo();
 }
-
 
 void AShooterCharacter::Reload()
 {
@@ -126,6 +115,11 @@ float AShooterCharacter::GetHealthPercent() const
 int AShooterCharacter::GetClipAmmo() const
 {
 	return Gun->clipAmmo;
+}
+
+int AShooterCharacter::GetMaxClipAmmo() const
+{
+	return Gun->maxClipAmmo;
 }
 
 int AShooterCharacter::GetTotalAmmo() const

@@ -39,13 +39,13 @@ public:
 	int GetClipAmmo() const;
 	
 	UFUNCTION(BlueprintPure)
+	int GetMaxClipAmmo() const;
+
+	UFUNCTION(BlueprintPure)
 	int GetTotalAmmo() const;
 
 	void Shoot();
 	void Reload();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
-	void TriggerdOutOfAmmoPopUp();
 
 private:
 	void MoveForward(float AxisValue);
@@ -68,10 +68,4 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float Health;
-
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> AmmoClass;
-
-
 };
