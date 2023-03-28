@@ -34,8 +34,18 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetHealthPercent() const;
+
+	UFUNCTION(BlueprintPure)
+	int GetClipAmmo() const;
 	
+	UFUNCTION(BlueprintPure)
+	int GetTotalAmmo() const;
+
 	void Shoot();
+	void Reload();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
+	void TriggerdOutOfAmmoPopUp();
 
 private:
 	void MoveForward(float AxisValue);
@@ -49,6 +59,7 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGun> GunClass;
 
+	//The weapon the player is currently holding
 	UPROPERTY()
 	AGun* Gun;
 
@@ -57,5 +68,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float Health;
+
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> AmmoClass;
+
 
 };

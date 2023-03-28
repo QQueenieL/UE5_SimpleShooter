@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 //#include "DrawDebugHelpers.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AGun::AGun()
@@ -16,6 +17,13 @@ AGun::AGun()
 	SetRootComponent(Root);
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Root);
+
+	//Set the default values for variables
+	maxTotalAmmo = 100;
+	maxClipAmmo = 12;
+	totalAmmo = 64;
+	clipAmmo = 12;
+	reloadTime = 1.0f;
 
 }
 
@@ -37,7 +45,7 @@ void AGun::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
 	UGameplayStatics::SpawnSoundAttached(MuzzleSound, Mesh, TEXT("MuzzleSoundSocket"));
-
+	clipAmmo -= 1;
 	FHitResult Hit;
 	FVector ShotDirection;
 	bool bSuccess = GunTrace(Hit, ShotDirection);
@@ -57,6 +65,25 @@ void AGun::PullTrigger()
 		}
 	}
 
+}
+
+void AGun::ReloadWeapon()
+{
+	if (clipAmmo != maxClipAmmo) //there is room to reload in the weapon
+	{
+		//carried more than enough ammo to fill the weapon
+		if (totalAmmo - (maxClipAmmo - clipAmmo) >= 0) 
+		{	
+			//fill in the clip with the amount shot
+			totalAmmo -= (maxClipAmmo - clipAmmo);
+			clipAmmo = maxClipAmmo;
+		}
+		else //fill in the rest of the carried ammo
+		{
+			clipAmmo += totalAmmo;
+			totalAmmo = 0;
+		}
+	}
 }
 
 bool AGun::GunTrace(FHitResult &Hit, FVector& ShotDirection)

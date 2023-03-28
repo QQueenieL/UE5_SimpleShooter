@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "SimpleShooterGameModeBase.h"
 
+
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
@@ -44,6 +45,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AShooterCharacter::LookUpRate);
 	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AShooterCharacter::LookRightRate);
 	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Shoot);
+	PlayerInputComponent->BindAction(TEXT("Reload"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Reload);
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -68,7 +70,25 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 
 void AShooterCharacter::Shoot()
 {
-	Gun->PullTrigger();
+	if (Gun->clipAmmo > 0)
+	{
+		Gun->PullTrigger();
+	}
+	else if (Gun->totalAmmo > 0)
+	{
+		Gun->ReloadWeapon();
+	}
+	else
+	{
+		TriggerdOutOfAmmoPopUp();
+	}
+}
+
+
+void AShooterCharacter::Reload()
+{
+
+	Gun->ReloadWeapon();
 }
 
 float AShooterCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent, class AController *EventInstigator, AActor *DamageCauser)
@@ -101,4 +121,14 @@ bool AShooterCharacter::IsDead() const
 float AShooterCharacter::GetHealthPercent() const
 {
 	return Health/MaxHealth;
+}
+
+int AShooterCharacter::GetClipAmmo() const
+{
+	return Gun->clipAmmo;
+}
+
+int AShooterCharacter::GetTotalAmmo() const
+{
+	return Gun->totalAmmo;
 }
