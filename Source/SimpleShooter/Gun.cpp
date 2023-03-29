@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 //#include "DrawDebugHelpers.h"
 #include "Blueprint/UserWidget.h"
+#include "Ammo.h"
 
 // Sets default values
 AGun::AGun()
@@ -25,6 +26,10 @@ AGun::AGun()
 	clipAmmo = 12;
 	reloadTime = 1.0f;
 
+	WeaponType = EWeaponType::E_AssaultRifle;
+	assaultRifleAmmo = 80;
+	pistolAmmo = 30;
+	shotgunAmmo = 16;
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +46,7 @@ void AGun::Tick(float DeltaTime)
 
 }
 
-void AGun::CheckAmmo()
+void AGun::CheckAmmo(EWeaponType _WeaponType)
 {
 	if (GetOwnerController()->IsPlayerController())
 	{
@@ -50,13 +55,9 @@ void AGun::CheckAmmo()
 			clipAmmo -= 1;
 			PullTrigger();
 		}
-		else if (totalAmmo > 0)
-		{
-			ReloadWeapon();
-		}
 		else
 		{
-			TriggerdOutOfAmmoPopUp();
+			ReloadWeapon(WeaponType);
 		}
 	}
 	else
@@ -91,23 +92,47 @@ void AGun::PullTrigger()
 
 }
 
-void AGun::ReloadWeapon()
+void AGun::ReloadWeapon(EWeaponType _WeaponType)
+{
+	switch(_WeaponType)
+	{
+		case EWeaponType::E_AssaultRifle:
+			assaultRifleAmmo = CalculateAmmo(assaultRifleAmmo);
+			break;
+		case EWeaponType::E_Pistol:
+			pistolAmmo = CalculateAmmo(pistolAmmo);
+			break;
+		case EWeaponType::E_Shotgun:
+			shotgunAmmo = CalculateAmmo(shotgunAmmo);
+			break;
+		default:
+			break;
+	}
+}
+
+int AGun::CalculateAmmo(int _AmmoAmount)
 {
 	if (clipAmmo != maxClipAmmo) //there is room to reload in the weapon
 	{
 		//carried more than enough ammo to fill the weapon
-		if (totalAmmo - (maxClipAmmo - clipAmmo) >= 0) 
+		if (_AmmoAmount - (maxClipAmmo - clipAmmo) >= 0) 
 		{	
 			//fill in the clip with the amount shot
-			totalAmmo -= (maxClipAmmo - clipAmmo);
+			_AmmoAmount -= (maxClipAmmo - clipAmmo);
 			clipAmmo = maxClipAmmo;
 		}
 		else //fill in the rest of the carried ammo
 		{
-			clipAmmo += totalAmmo;
-			totalAmmo = 0;
+			clipAmmo += _AmmoAmount;
+			_AmmoAmount = 0;
 		}
 	}
+	else
+	{
+		TriggerdOutOfAmmoPopUp();
+	}
+
+	return _AmmoAmount;
 }
 
 bool AGun::GunTrace(FHitResult &Hit, FVector& ShotDirection)
@@ -142,4 +167,22 @@ AController* AGun::GetOwnerController() const
 		return nullptr;
 	}
 	return OwnerPawn->GetController();
+}
+
+void AGun::AddAmmo(EAmmoType AmmoType, int AmmoAmount)
+{
+	switch (AmmoType)
+	{
+	case EAmmoType::E_AssaultRifle:
+		assaultRifleAmmo += AmmoAmount;
+		break;
+	case EAmmoType::E_Pistol:
+		pistolAmmo += AmmoAmount;
+		break;
+	case EAmmoType::E_Shotgun:
+		shotgunAmmo += AmmoAmount;
+		break;
+	default:
+		break;
+	}
 }

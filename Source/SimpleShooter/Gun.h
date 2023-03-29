@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "Gun.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	E_AssaultRifle UMETA(DisplayName = "ASSAULT_RIFLE"),
+	E_Pistol UMETA(DisplayName = "PISTOL"),
+	E_Shotgun UMETA(DisplayName = "SHOTGUN")
+};
+
 UCLASS()
 class SIMPLESHOOTER_API AGun : public AActor
 {
@@ -23,8 +31,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void PullTrigger();
-	void CheckAmmo();
-	void ReloadWeapon();
+	void CheckAmmo(EWeaponType _WeaponType);
+	//Reload the current weapon
+	void ReloadWeapon(EWeaponType _WeaponType);
+	//Calculate the ammo in the weapon's clip and on the player
+	int CalculateAmmo(int _AmmoAmount);
 
 	//The total amount of ammo that can be carried for the weapon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
@@ -48,6 +59,23 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
 	void TriggerdOutOfAmmoPopUp();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	EWeaponType WeaponType;
+
+	//The amount of Assult Rifle ammo the player currently has
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	int assaultRifleAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	int pistolAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	int shotgunAmmo;
+
+	//Add ammo to the player's correct ammo type
+	UFUNCTION(BlueprintCallable)
+	void AddAmmo(EAmmoType AmmoType, int AmmoAmount);
 
 private:
 	UPROPERTY(VisibleAnywhere)

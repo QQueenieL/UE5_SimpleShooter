@@ -45,7 +45,11 @@ public:
 	int GetTotalAmmo() const;
 
 	void Shoot();
-	void Reload();
+	void ManualReload();
+	
+	//The weapon the player is currently holding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	AGun* Gun;
 
 private:
 	void MoveForward(float AxisValue);
@@ -58,10 +62,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGun> GunClass;
-
-	//The weapon the player is currently holding
-	UPROPERTY()
-	AGun* Gun;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MaxHealth = 100;

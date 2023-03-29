@@ -4,7 +4,7 @@
 #include "Gun.h"
 #include "Components/CapsuleComponent.h"
 #include "SimpleShooterGameModeBase.h"
-
+#include "Ammo.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -45,7 +45,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AShooterCharacter::LookUpRate);
 	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AShooterCharacter::LookRightRate);
 	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Shoot);
-	PlayerInputComponent->BindAction(TEXT("Reload"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Reload);
+	PlayerInputComponent->BindAction(TEXT("Reload"), EInputEvent::IE_Pressed, this, &AShooterCharacter::ManualReload);
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -71,13 +71,13 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 void AShooterCharacter::Shoot()
 {
 	//Gun->PullTrigger();
-	Gun->CheckAmmo();
+	Gun->CheckAmmo(Gun->WeaponType);
 }
 
-void AShooterCharacter::Reload()
+void AShooterCharacter::ManualReload()
 {
 
-	Gun->ReloadWeapon();
+	Gun->ReloadWeapon(Gun->WeaponType);
 }
 
 float AShooterCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent, class AController *EventInstigator, AActor *DamageCauser)
@@ -124,5 +124,15 @@ int AShooterCharacter::GetMaxClipAmmo() const
 
 int AShooterCharacter::GetTotalAmmo() const
 {
-	return Gun->totalAmmo;
+	switch (Gun->WeaponType)
+	{
+	case EWeaponType::E_AssaultRifle:
+		return Gun->assaultRifleAmmo;
+	case EWeaponType::E_Pistol:
+		return Gun->pistolAmmo;
+	case EWeaponType::E_Shotgun:
+		return Gun->shotgunAmmo;
+	default:
+		return 0;
+	}
 }
