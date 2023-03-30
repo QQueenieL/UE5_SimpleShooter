@@ -2,9 +2,10 @@
 
 #include "ShooterCharacter.h"
 #include "Gun.h"
+#include "Ammo.h"
 #include "Components/CapsuleComponent.h"
 #include "SimpleShooterGameModeBase.h"
-#include "Ammo.h"
+
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -18,12 +19,14 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Health = MaxHealth;
+	weaponIndex = 0;
+
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	GetMesh()->HideBoneByName(TEXT("Weapon-r"), EPhysBodyOp::PBO_None);
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 	Gun->SetOwner(this);
-
-	Health = MaxHealth;
+	Weapons.Add(Gun);
 }
 
 // Called every frame
@@ -46,6 +49,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AShooterCharacter::LookRightRate);
 	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Shoot);
 	PlayerInputComponent->BindAction(TEXT("Reload"), EInputEvent::IE_Pressed, this, &AShooterCharacter::ManualReload);
+	PlayerInputComponent->BindAction(TEXT("SwitchPrimary"), EInputEvent::IE_Pressed, this, &AShooterCharacter::SwitchToNextPrimaryWeapon);
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -70,14 +74,14 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 
 void AShooterCharacter::Shoot()
 {
-	//Gun->PullTrigger();
-	Gun->CheckAmmo(Gun->WeaponType);
+	//Weapons[weaponIndex]->PullTrigger();
+	Weapons[weaponIndex]->CheckAmmo(Weapons[weaponIndex]->WeaponType);
 }
 
 void AShooterCharacter::ManualReload()
 {
 
-	Gun->ReloadWeapon(Gun->WeaponType);
+	Weapons[weaponIndex]->ReloadWeapon(Weapons[weaponIndex]->WeaponType);
 }
 
 float AShooterCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent, class AController *EventInstigator, AActor *DamageCauser)
@@ -114,25 +118,93 @@ float AShooterCharacter::GetHealthPercent() const
 
 int AShooterCharacter::GetClipAmmo() const
 {
-	return Gun->clipAmmo;
+	return Weapons[weaponIndex]->clipAmmo;
 }
 
 int AShooterCharacter::GetMaxClipAmmo() const
 {
-	return Gun->maxClipAmmo;
+	return Weapons[weaponIndex]->maxClipAmmo;
 }
 
-int AShooterCharacter::GetTotalAmmo() const
+// int AShooterCharacter::GetTotalAmmo() const
+// {
+// 	switch (Weapons[weaponIndex]->WeaponType)
+// 	{
+// 	case EWeaponType::E_AssaultRifle:
+// 		return Weapons[weaponIndex]->Ammo->assaultRifleAmmo;
+// 	case EWeaponType::E_Pistol:
+// 		return Weapons[weaponIndex]->Ammo->pistolAmmo;
+// 	case EWeaponType::E_Shotgun:
+// 		return Weapons[weaponIndex]->Ammo->shotgunAmmo;
+// 	default:
+// 		return 0;
+// 	}
+// }
+
+void AShooterCharacter::SwitchToNextPrimaryWeapon()
 {
-	switch (Gun->WeaponType)
+	switch(weaponIndex)
 	{
-	case EWeaponType::E_AssaultRifle:
-		return Gun->assaultRifleAmmo;
+		case 0:
+			if(Weapons.Num() > 1)
+			{
+				weaponIndex = 1;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			else
+			{
+				weaponIndex = 0;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			break;
+		case 1:
+			if(Weapons.Num() > 2)
+			{
+				weaponIndex = 2;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			else
+			{
+				weaponIndex = 0;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			break;
+		case 2:
+			if(Weapons.Num() > 3)
+			{
+				weaponIndex = 3;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			else
+			{
+				weaponIndex = 0;
+				Weapons[weaponIndex]->SwitchWeaponMesh(weaponIndex);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+void AShooterCharacter::AddWeapon(EWeaponType WeaponType)
+{
+	switch (WeaponType)
+	{
 	case EWeaponType::E_Pistol:
-		return Gun->pistolAmmo;
+	{
+		Weapons[weaponIndex++]->WeaponType = WeaponType;
+		Weapons.Add(Weapons[weaponIndex++]);
+		break;
+	}
+
 	case EWeaponType::E_Shotgun:
-		return Gun->shotgunAmmo;
+	{
+		Weapons[weaponIndex++]->WeaponType = WeaponType;
+		Weapons.Add(Weapons[weaponIndex++]);
+		break;
+	}
+
 	default:
-		return 0;
+		break;
 	}
 }

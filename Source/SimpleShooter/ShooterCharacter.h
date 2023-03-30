@@ -21,6 +21,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//Switch the player's current primary weapon to the next in the chain
+	void SwitchToNextPrimaryWeapon();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -44,12 +47,25 @@ public:
 	UFUNCTION(BlueprintPure)
 	int GetTotalAmmo() const;
 
+	// UFUNCTION(BlueprintPure)
+	// FString GetWeaponType() const;
+	
 	void Shoot();
 	void ManualReload();
 	
 	//The weapon the player is currently holding
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	AGun* Gun;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	TArray<AGun*> Weapons;
+
+	//The index of the weapon that the character is currently using
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	int weaponIndex;
+
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon(EWeaponType WeaponType);
 
 private:
 	void MoveForward(float AxisValue);

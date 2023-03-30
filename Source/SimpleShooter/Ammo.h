@@ -27,16 +27,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//The total amount of ammo in this pickup
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	int AmmoAmount;
+	// //The total amount of ammo in this pickup
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	// int AmmoAmount;
 
-	//The type of ammo in this pickup
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	EAmmoType AmmoType;
+	// //The type of ammo in this pickup
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	// EAmmoType AmmoType;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+
+	
+
 
 };

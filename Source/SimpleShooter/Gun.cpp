@@ -2,11 +2,12 @@
 
 
 #include "Gun.h"
+#include "Ammo.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 //#include "DrawDebugHelpers.h"
 #include "Blueprint/UserWidget.h"
-#include "Ammo.h"
+
 
 // Sets default values
 AGun::AGun()
@@ -22,14 +23,17 @@ AGun::AGun()
 	//Set the default values for variables
 	maxTotalAmmo = 100;
 	maxClipAmmo = 12;
-	totalAmmo = 64;
+	totalAmmo = 24;
 	clipAmmo = 12;
 	reloadTime = 1.0f;
 
 	WeaponType = EWeaponType::E_AssaultRifle;
-	assaultRifleAmmo = 80;
+	
+	//The amount of ammo to begin with each WeaponType
+	assaultRifleAmmo = 24;
 	pistolAmmo = 30;
-	shotgunAmmo = 16;
+	shotgunAmmo = 10;
+
 }
 
 // Called when the game starts or when spawned
@@ -50,14 +54,33 @@ void AGun::CheckAmmo(EWeaponType _WeaponType)
 {
 	if (GetOwnerController()->IsPlayerController())
 	{
+		switch(_WeaponType)
+		{
+			case EWeaponType::E_AssaultRifle:
+				totalAmmo = assaultRifleAmmo;
+				break;
+			case EWeaponType::E_Pistol:
+				totalAmmo = pistolAmmo;
+				break;
+			case EWeaponType::E_Shotgun:
+				totalAmmo = shotgunAmmo;
+				break;
+			default:
+				break;
+		}
+
 		if (clipAmmo > 0)
 		{
 			clipAmmo -= 1;
 			PullTrigger();
 		}
-		else
+		else if(totalAmmo > 0)
 		{
 			ReloadWeapon(WeaponType);
+		}
+		else
+		{
+			TriggerdOutOfAmmoPopUp();
 		}
 	}
 	else
@@ -127,12 +150,26 @@ int AGun::CalculateAmmo(int _AmmoAmount)
 			_AmmoAmount = 0;
 		}
 	}
-	else
-	{
-		TriggerdOutOfAmmoPopUp();
-	}
 
 	return _AmmoAmount;
+}
+
+void AGun::AddAmmo(EAmmoType AmmoType, int AmmoAmount)
+{
+	switch (AmmoType)
+	{
+	case EAmmoType::E_AssaultRifle:
+		assaultRifleAmmo += AmmoAmount;
+		break;
+	case EAmmoType::E_Pistol:
+		pistolAmmo += AmmoAmount;
+		break;
+	case EAmmoType::E_Shotgun:
+		shotgunAmmo += AmmoAmount;
+		break;
+	default:
+		break;
+	}
 }
 
 bool AGun::GunTrace(FHitResult &Hit, FVector& ShotDirection)
@@ -167,22 +204,4 @@ AController* AGun::GetOwnerController() const
 		return nullptr;
 	}
 	return OwnerPawn->GetController();
-}
-
-void AGun::AddAmmo(EAmmoType AmmoType, int AmmoAmount)
-{
-	switch (AmmoType)
-	{
-	case EAmmoType::E_AssaultRifle:
-		assaultRifleAmmo += AmmoAmount;
-		break;
-	case EAmmoType::E_Pistol:
-		pistolAmmo += AmmoAmount;
-		break;
-	case EAmmoType::E_Shotgun:
-		shotgunAmmo += AmmoAmount;
-		break;
-	default:
-		break;
-	}
 }

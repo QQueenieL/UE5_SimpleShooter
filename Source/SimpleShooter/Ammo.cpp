@@ -10,8 +10,10 @@ AAmmo::AAmmo()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Set default values for variables
-	AmmoType = EAmmoType::E_AssaultRifle;
-	AmmoAmount = 20;
+	// AmmoType = EAmmoType::E_AssaultRifle;
+	// AmmoAmount = 20;
+
+
 }
 
 // Called when the game starts or when spawned

@@ -31,6 +31,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void PullTrigger();
+
 	void CheckAmmo(EWeaponType _WeaponType);
 	//Reload the current weapon
 	void ReloadWeapon(EWeaponType _WeaponType);
@@ -63,6 +64,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	EWeaponType WeaponType;
 
+	//Add ammo to the player's correct ammo type
+	UFUNCTION(BlueprintCallable)
+	void AddAmmo(EAmmoType AmmoType, int AmmoAmount);
+
+	//Switches the weapon the character was using to the new weapon they are using
+	UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
+	void SwitchWeaponMesh(int index);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USkeletalMeshComponent* Mesh;
+	
 	//The amount of Assult Rifle ammo the player currently has
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	int assaultRifleAmmo;
@@ -72,7 +84,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	int shotgunAmmo;
-
 	//Add ammo to the player's correct ammo type
 	UFUNCTION(BlueprintCallable)
 	void AddAmmo(EAmmoType AmmoType, int AmmoAmount);
@@ -81,8 +92,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
 
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* Mesh;
+	//UPROPERTY(VisibleAnywhere)
+	//USkeletalMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem *MuzzleFlash;
